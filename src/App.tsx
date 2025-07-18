@@ -3,393 +3,385 @@ import { Card, CardContent, CardHeader, CardTitle } from './components/ui/card'
 import { Button } from './components/ui/button'
 import { Input } from './components/ui/input'
 import { Label } from './components/ui/label'
-import { Switch } from './components/ui/switch'
 import { Badge } from './components/ui/badge'
-import { Progress } from './components/ui/progress'
 import { Separator } from './components/ui/separator'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './components/ui/select'
 import { 
-  Play, 
-  Square, 
-  Upload, 
-  Download, 
-  Settings, 
-  User, 
-  Eye, 
-  EyeOff, 
-  Plus,
-  Trash2,
-  RefreshCw,
-  Zap,
-  Database,
-  Shield
+  Search, 
+  Calendar,
+  User,
+  FileText,
+  Copy,
+  Printer,
+  RotateCcw,
+  Settings,
+  HelpCircle,
+  LogOut,
+  ChevronDown,
+  Eye,
+  Package,
+  Coins,
+  Clock,
+  CheckCircle,
+  XCircle,
+  Minus
 } from 'lucide-react'
 
-interface UserAccount {
-  id: string
-  username: string
-  password: string
-  status: 'active' | 'inactive' | 'processing'
-}
-
 function App() {
-  const [isProcessing, setIsProcessing] = useState(false)
-  const [progress, setProgress] = useState(0)
-  const [showPasswords, setShowPasswords] = useState(false)
-  const [accounts, setAccounts] = useState<UserAccount[]>([
-    { id: '1', username: 'user@example.com', password: 'password123', status: 'active' },
-    { id: '2', username: 'demo@test.com', password: 'demo456', status: 'inactive' },
-    { id: '3', username: 'admin@spex.com', password: 'admin789', status: 'processing' }
-  ])
-  
-  const [config, setConfig] = useState({
-    autoProcess: true,
-    enableLogging: false,
-    useProxy: true,
-    batchMode: false,
-    validateData: true
+  const [searchData, setSearchData] = useState({
+    dateOfService: '7/17/2025',
+    firstName: '',
+    lastName: '',
+    dateOfBirth: '',
+    memberIdLastSSN: '',
+    visionPlan: 'All',
+    authorization: 'Exam - Frame - Lens - Contact Lens - CL Lens Fit - Medical',
+    appointmentType: 'None'
   })
 
-  const handleStart = () => {
-    setIsProcessing(true)
-    setProgress(0)
-    
-    // Simulate processing
-    const interval = setInterval(() => {
-      setProgress(prev => {
-        if (prev >= 100) {
-          clearInterval(interval)
-          setIsProcessing(false)
-          return 100
-        }
-        return prev + Math.random() * 15
-      })
-    }, 500)
+  const patientData = {
+    planName: 'VSP Choice Plan',
+    patientName: 'LIEZL CHICLANA',
+    dateOfBirth: '08/08/1983',
+    nameSearched: 'LIEZL CHICLANA',
+    nameDiscovered: 'LIEZL CHICLANA',
+    authorization: '4894262'
   }
 
-  const handleStop = () => {
-    setIsProcessing(false)
-    setProgress(0)
+  const eligibilityData = [
+    { service: 'Exam', eligibility: 'Yes', productService: 'Copay', price: '$0' },
+    { service: 'Frame', eligibility: 'Yes', productService: 'Frame Allowance', price: '$175.00' },
+    { service: 'Lens', eligibility: 'Yes', productService: '--', price: '--' },
+    { service: 'Contact Lens', eligibility: 'Yes', productService: 'Contact Lens Allowance', price: '$150.00' },
+    { service: 'Contact Lens Fitting', eligibility: 'Yes', productService: 'Contact Exam Service', price: '--' },
+    { service: 'Medical', eligibility: '--', productService: 'Medical Copay', price: '--' }
+  ]
+
+  const visionPlans = ['All', 'VSP', 'VERSANT', 'EYEMED', 'SPECTERA', 'MARCH', 'NVA']
+
+  const getEligibilityIcon = (eligibility: string) => {
+    if (eligibility === 'Yes') return <CheckCircle className="w-4 h-4 text-green-400" />
+    if (eligibility === '--') return <Minus className="w-4 h-4 text-gray-400" />
+    return <XCircle className="w-4 h-4 text-red-400" />
   }
 
-  const addAccount = () => {
-    const newAccount: UserAccount = {
-      id: Date.now().toString(),
-      username: '',
-      password: '',
-      status: 'inactive'
-    }
-    setAccounts([...accounts, newAccount])
-  }
-
-  const removeAccount = (id: string) => {
-    setAccounts(accounts.filter(acc => acc.id !== id))
-  }
-
-  const updateAccount = (id: string, field: keyof UserAccount, value: string) => {
-    setAccounts(accounts.map(acc => 
-      acc.id === id ? { ...acc, [field]: value } : acc
-    ))
-  }
-
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'active': return 'bg-green-500'
-      case 'processing': return 'bg-purple-500 status-indicator'
-      case 'inactive': return 'bg-gray-500'
-      default: return 'bg-gray-500'
-    }
+  const getEligibilityBadge = (eligibility: string) => {
+    if (eligibility === 'Yes') return <Badge className="bg-green-500/20 text-green-400 border-green-500/30">Yes</Badge>
+    if (eligibility === '--') return <Badge variant="outline" className="border-gray-500/30 text-gray-400">--</Badge>
+    return <Badge className="bg-red-500/20 text-red-400 border-red-500/30">No</Badge>
   }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white">
       {/* Top Navigation */}
       <header className="border-b border-purple-500/20 bg-slate-900/50 backdrop-blur-sm">
-        <div className="container mx-auto px-6 py-4">
+        <div className="container mx-auto px-6 py-3">
           <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-3">
-              <div className="w-8 h-8 bg-gradient-to-br from-purple-500 to-purple-600 rounded-lg flex items-center justify-center">
-                <Zap className="w-5 h-5 text-white" />
+            <div className="flex items-center space-x-8">
+              <div className="flex items-center space-x-3">
+                <div className="w-8 h-8 bg-gradient-to-br from-purple-500 to-purple-600 rounded-lg flex items-center justify-center">
+                  <Package className="w-5 h-5 text-white" />
+                </div>
+                <h1 className="text-xl font-bold bg-gradient-to-r from-purple-400 to-purple-600 bg-clip-text text-transparent">
+                  SPEXFETCH
+                </h1>
               </div>
-              <h1 className="text-2xl font-bold bg-gradient-to-r from-purple-400 to-purple-600 bg-clip-text text-transparent">
-                SpexFetch
-              </h1>
+              
+              {/* Navigation Tabs */}
+              <nav className="flex items-center space-x-6">
+                <Button variant="ghost" size="sm" className="text-gray-300 hover:text-white">
+                  <Settings className="w-4 h-4 mr-2" />
+                  Configuration
+                </Button>
+                <Button className="bg-purple-600 hover:bg-purple-700 text-white px-6">
+                  <Search className="w-4 h-4 mr-2" />
+                  Single Search
+                </Button>
+                <Button variant="ghost" size="sm" className="text-gray-300 hover:text-white">
+                  <FileText className="w-4 h-4 mr-2" />
+                  Results
+                </Button>
+                <Button variant="ghost" size="sm" className="text-gray-300 hover:text-white">
+                  <Package className="w-4 h-4 mr-2" />
+                  Batch Manager
+                </Button>
+              </nav>
             </div>
             
             <div className="flex items-center space-x-4">
-              <Button variant="ghost" size="sm" className="text-purple-300 hover:text-purple-100">
-                <Settings className="w-4 h-4 mr-2" />
-                Settings
+              <div className="flex items-center space-x-2 bg-orange-500/20 px-3 py-1 rounded-full">
+                <Coins className="w-4 h-4 text-orange-400" />
+                <span className="text-orange-400 font-medium">41545 Units</span>
+              </div>
+              <Button variant="ghost" size="sm" className="text-gray-300 hover:text-white">
+                <Clock className="w-4 h-4" />
               </Button>
-              <Button variant="ghost" size="sm" className="text-purple-300 hover:text-purple-100">
-                <User className="w-4 h-4 mr-2" />
-                Profile
+              <Button variant="ghost" size="sm" className="text-gray-300 hover:text-white">
+                <HelpCircle className="w-4 h-4" />
               </Button>
             </div>
           </div>
         </div>
       </header>
 
-      <div className="container mx-auto px-6 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          
-          {/* Configuration Panel */}
-          <div className="lg:col-span-2 space-y-6">
-            <Card className="cyberpunk-border bg-slate-900/50 backdrop-blur-sm">
-              <CardHeader>
-                <CardTitle className="flex items-center text-purple-300">
-                  <Database className="w-5 h-5 mr-2" />
-                  Configuration Panel
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div className="flex items-center justify-between">
-                    <Label htmlFor="auto-process" className="text-sm font-medium">Auto Process</Label>
-                    <Switch 
-                      id="auto-process"
-                      checked={config.autoProcess}
-                      onCheckedChange={(checked) => setConfig({...config, autoProcess: checked})}
-                    />
-                  </div>
-                  
-                  <div className="flex items-center justify-between">
-                    <Label htmlFor="enable-logging" className="text-sm font-medium">Enable Logging</Label>
-                    <Switch 
-                      id="enable-logging"
-                      checked={config.enableLogging}
-                      onCheckedChange={(checked) => setConfig({...config, enableLogging: checked})}
-                    />
-                  </div>
-                  
-                  <div className="flex items-center justify-between">
-                    <Label htmlFor="use-proxy" className="text-sm font-medium">Use Proxy</Label>
-                    <Switch 
-                      id="use-proxy"
-                      checked={config.useProxy}
-                      onCheckedChange={(checked) => setConfig({...config, useProxy: checked})}
-                    />
-                  </div>
-                  
-                  <div className="flex items-center justify-between">
-                    <Label htmlFor="batch-mode" className="text-sm font-medium">Batch Mode</Label>
-                    <Switch 
-                      id="batch-mode"
-                      checked={config.batchMode}
-                      onCheckedChange={(checked) => setConfig({...config, batchMode: checked})}
-                    />
-                  </div>
-                  
-                  <div className="flex items-center justify-between md:col-span-2">
-                    <Label htmlFor="validate-data" className="text-sm font-medium">Validate Data</Label>
-                    <Switch 
-                      id="validate-data"
-                      checked={config.validateData}
-                      onCheckedChange={(checked) => setConfig({...config, validateData: checked})}
-                    />
-                  </div>
+      <div className="container mx-auto px-6 py-6">
+        {/* Search Form */}
+        <Card className="cyberpunk-border bg-slate-900/50 backdrop-blur-sm mb-6">
+          <CardContent className="pt-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-6">
+              {/* Date of Service */}
+              <div className="space-y-2">
+                <Label className="text-sm font-medium text-gray-300">Date of Service</Label>
+                <div className="relative">
+                  <Input 
+                    value={searchData.dateOfService}
+                    onChange={(e) => setSearchData({...searchData, dateOfService: e.target.value})}
+                    className="bg-slate-800/50 border-purple-500/30 pr-10"
+                  />
+                  <Calendar className="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
                 </div>
-              </CardContent>
-            </Card>
+              </div>
 
-            {/* File Management */}
+              {/* First Name */}
+              <div className="space-y-2">
+                <Label className="text-sm font-medium text-gray-300">First Name</Label>
+                <div className="relative">
+                  <Input 
+                    value={searchData.firstName}
+                    onChange={(e) => setSearchData({...searchData, firstName: e.target.value})}
+                    className="bg-slate-800/50 border-purple-500/30 pr-10"
+                  />
+                  <User className="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+                </div>
+              </div>
+
+              {/* Last Name */}
+              <div className="space-y-2">
+                <Label className="text-sm font-medium text-gray-300">Last Name</Label>
+                <div className="relative">
+                  <Input 
+                    value={searchData.lastName}
+                    onChange={(e) => setSearchData({...searchData, lastName: e.target.value})}
+                    className="bg-slate-800/50 border-purple-500/30 pr-10"
+                  />
+                  <User className="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+                </div>
+              </div>
+
+              {/* Date of Birth */}
+              <div className="space-y-2">
+                <Label className="text-sm font-medium text-gray-300">Date of Birth</Label>
+                <div className="relative">
+                  <Input 
+                    placeholder="//"
+                    value={searchData.dateOfBirth}
+                    onChange={(e) => setSearchData({...searchData, dateOfBirth: e.target.value})}
+                    className="bg-slate-800/50 border-purple-500/30 pr-10"
+                  />
+                  <Calendar className="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+                </div>
+              </div>
+
+              {/* Member ID/Last 4 SSN */}
+              <div className="space-y-2">
+                <Label className="text-sm font-medium text-gray-300">Member ID/Last 4 SSN</Label>
+                <div className="relative">
+                  <Input 
+                    value={searchData.memberIdLastSSN}
+                    onChange={(e) => setSearchData({...searchData, memberIdLastSSN: e.target.value})}
+                    className="bg-slate-800/50 border-purple-500/30 pr-10"
+                  />
+                  <FileText className="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+                </div>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+              {/* Vision Plan */}
+              <div className="space-y-2">
+                <Label className="text-sm font-medium text-gray-300">What vision plan do you want to Search?</Label>
+                <div className="flex flex-wrap gap-2">
+                  {visionPlans.map((plan) => (
+                    <Button
+                      key={plan}
+                      variant={searchData.visionPlan === plan ? "default" : "outline"}
+                      size="sm"
+                      onClick={() => setSearchData({...searchData, visionPlan: plan})}
+                      className={searchData.visionPlan === plan 
+                        ? "bg-purple-600 hover:bg-purple-700" 
+                        : "border-purple-500/30 text-purple-300 hover:bg-purple-500/10"
+                      }
+                    >
+                      {plan}
+                    </Button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Authorization */}
+              <div className="space-y-2">
+                <Label className="text-sm font-medium text-gray-300">What do want to authorize?</Label>
+                <Select value={searchData.authorization} onValueChange={(value) => setSearchData({...searchData, authorization: value})}>
+                  <SelectTrigger className="bg-slate-800/50 border-purple-500/30">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent className="bg-slate-800 border-purple-500/30">
+                    <SelectItem value="Exam - Frame - Lens - Contact Lens - CL Lens Fit - Medical">
+                      Exam - Frame - Lens - Contact Lens - CL Lens Fit - Medical
+                    </SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Appointment Type */}
+              <div className="space-y-2">
+                <Label className="text-sm font-medium text-gray-300">Appointment Type?</Label>
+                <Select value={searchData.appointmentType} onValueChange={(value) => setSearchData({...searchData, appointmentType: value})}>
+                  <SelectTrigger className="bg-slate-800/50 border-purple-500/30">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent className="bg-slate-800 border-purple-500/30">
+                    <SelectItem value="None">None</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+
+            <div className="flex justify-end space-x-4">
+              <Button variant="outline" className="border-purple-500/30 text-purple-300 hover:bg-purple-500/10">
+                Clear Filter
+              </Button>
+              <Button className="bg-purple-600 hover:bg-purple-700 px-8">
+                <Search className="w-4 h-4 mr-2" />
+                Search
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Results Section */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Patient Information */}
+          <div className="lg:col-span-1 space-y-6">
+            {/* VSP Vision Card */}
             <Card className="cyberpunk-border bg-slate-900/50 backdrop-blur-sm">
-              <CardHeader>
-                <CardTitle className="flex items-center text-purple-300">
-                  <Upload className="w-5 h-5 mr-2" />
-                  File Input/Output Management
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="input-file">Input File</Label>
-                    <div className="flex space-x-2">
-                      <Input 
-                        id="input-file"
-                        placeholder="Select input file..."
-                        className="bg-slate-800/50 border-purple-500/30"
-                      />
-                      <Button size="sm" className="cyberpunk-button">
-                        <Upload className="w-4 h-4" />
-                      </Button>
-                    </div>
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <Label htmlFor="output-file">Output Directory</Label>
-                    <div className="flex space-x-2">
-                      <Input 
-                        id="output-file"
-                        placeholder="Select output directory..."
-                        className="bg-slate-800/50 border-purple-500/30"
-                      />
-                      <Button size="sm" className="cyberpunk-button">
-                        <Download className="w-4 h-4" />
-                      </Button>
-                    </div>
+              <CardContent className="pt-6">
+                <div className="flex items-center space-x-3 mb-4">
+                  <div className="bg-blue-600 text-white px-3 py-1 rounded text-sm font-medium">
+                    vsp VISION
                   </div>
                 </div>
                 
-                {/* Progress Bar */}
-                {isProcessing && (
-                  <div className="space-y-2">
-                    <div className="flex justify-between text-sm">
-                      <span>Processing...</span>
-                      <span>{Math.round(progress)}%</span>
-                    </div>
-                    <Progress value={progress} className="cyberpunk-glow" />
+                <div className="space-y-3">
+                  <div className="flex items-center space-x-2">
+                    <Eye className="w-4 h-4 text-purple-400" />
+                    <span className="text-sm font-medium">Plan Name: {patientData.planName}</span>
                   </div>
-                )}
+                  
+                  <div className="flex items-center space-x-2">
+                    <User className="w-4 h-4 text-purple-400" />
+                    <span className="text-lg font-bold">{patientData.patientName}</span>
+                  </div>
+                  
+                  <div className="flex items-center space-x-2">
+                    <Calendar className="w-4 h-4 text-purple-400" />
+                    <span className="text-sm">{patientData.dateOfBirth}</span>
+                  </div>
+                </div>
+
+                <div className="flex space-x-2 mt-4">
+                  <Button size="sm" className="bg-red-600 hover:bg-red-700 flex-1">
+                    <FileText className="w-4 h-4 mr-2" />
+                    View PDF
+                  </Button>
+                  <Button size="sm" className="bg-green-600 hover:bg-green-700 flex-1">
+                    <CheckCircle className="w-4 h-4 mr-2" />
+                    Active
+                  </Button>
+                </div>
+
+                <Separator className="bg-purple-500/20 my-4" />
+
+                <div className="space-y-2 text-sm">
+                  <div className="flex items-center space-x-2">
+                    <Package className="w-4 h-4 text-orange-400" />
+                    <span className="text-gray-400">Name Searched:</span>
+                  </div>
+                  <div className="text-gray-300 ml-6">Name Discovered: {patientData.nameDiscovered}</div>
+                  
+                  <div className="flex items-center space-x-2 mt-3">
+                    <FileText className="w-4 h-4 text-orange-400" />
+                    <span className="text-gray-400">Authorization: {patientData.authorization}</span>
+                  </div>
+                </div>
               </CardContent>
             </Card>
 
             {/* Action Buttons */}
-            <Card className="cyberpunk-border bg-slate-900/50 backdrop-blur-sm">
-              <CardContent className="pt-6">
-                <div className="flex justify-center space-x-4">
-                  <Button 
-                    onClick={handleStart}
-                    disabled={isProcessing}
-                    className="cyberpunk-button px-8 py-3"
-                  >
-                    <Play className="w-5 h-5 mr-2" />
-                    {isProcessing ? 'Processing...' : 'Start Process'}
-                  </Button>
-                  
-                  <Button 
-                    onClick={handleStop}
-                    disabled={!isProcessing}
-                    variant="destructive"
-                    className="px-8 py-3"
-                  >
-                    <Square className="w-5 h-5 mr-2" />
-                    Stop
-                  </Button>
-                  
-                  <Button 
-                    variant="outline"
-                    className="px-8 py-3 border-purple-500/50 text-purple-300 hover:bg-purple-500/10"
-                  >
-                    <RefreshCw className="w-5 h-5 mr-2" />
-                    Reset
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
+            <div className="flex space-x-2">
+              <Button variant="outline" className="border-purple-500/30 text-purple-300 hover:bg-purple-500/10 flex-1">
+                <Copy className="w-4 h-4 mr-2" />
+                Copy for EHR Notes
+              </Button>
+              <Button variant="outline" className="border-purple-500/30 text-purple-300 hover:bg-purple-500/10 flex-1">
+                <Printer className="w-4 h-4 mr-2" />
+                Print Plans
+              </Button>
+            </div>
           </div>
 
-          {/* Vision Payer Login Panel */}
-          <div className="space-y-6">
+          {/* Eligibility Table */}
+          <div className="lg:col-span-2">
             <Card className="cyberpunk-border bg-slate-900/50 backdrop-blur-sm">
               <CardHeader>
-                <CardTitle className="flex items-center justify-between text-purple-300">
-                  <div className="flex items-center">
-                    <Shield className="w-5 h-5 mr-2" />
-                    Vision Payer Login
-                  </div>
-                  <Button 
-                    variant="ghost" 
-                    size="sm"
-                    onClick={() => setShowPasswords(!showPasswords)}
-                    className="text-purple-400 hover:text-purple-300"
-                  >
-                    {showPasswords ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                  </Button>
+                <CardTitle className="text-purple-300 flex items-center justify-between">
+                  <span>Eligibility & Benefits</span>
+                  <RotateCcw className="w-5 h-5 text-purple-400" />
                 </CardTitle>
               </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="flex justify-between items-center">
-                  <span className="text-sm font-medium">User Accounts</span>
-                  <Button 
-                    onClick={addAccount}
-                    size="sm" 
-                    className="cyberpunk-button"
-                  >
-                    <Plus className="w-4 h-4 mr-1" />
-                    Add
-                  </Button>
-                </div>
-                
-                <Separator className="bg-purple-500/20" />
-                
-                <div className="space-y-3 max-h-96 overflow-y-auto">
-                  {accounts.map((account) => (
-                    <div key={account.id} className="space-y-2 p-3 rounded-lg bg-slate-800/30 border border-purple-500/20">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center space-x-2">
-                          <div className={`w-2 h-2 rounded-full ${getStatusColor(account.status)}`} />
-                          <Badge variant="outline" className="text-xs border-purple-500/30">
-                            {account.status}
-                          </Badge>
-                        </div>
-                        <Button 
-                          onClick={() => removeAccount(account.id)}
-                          variant="ghost" 
-                          size="sm"
-                          className="text-red-400 hover:text-red-300 h-6 w-6 p-0"
-                        >
-                          <Trash2 className="w-3 h-3" />
-                        </Button>
-                      </div>
-                      
-                      <Input
-                        placeholder="Username/Email"
-                        value={account.username}
-                        onChange={(e) => updateAccount(account.id, 'username', e.target.value)}
-                        className="bg-slate-700/50 border-purple-500/30 text-sm"
-                      />
-                      
-                      <Input
-                        type={showPasswords ? 'text' : 'password'}
-                        placeholder="Password"
-                        value={account.password}
-                        onChange={(e) => updateAccount(account.id, 'password', e.target.value)}
-                        className="bg-slate-700/50 border-purple-500/30 text-sm"
-                      />
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Status Panel */}
-            <Card className="cyberpunk-border bg-slate-900/50 backdrop-blur-sm">
-              <CardHeader>
-                <CardTitle className="text-purple-300">System Status</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="grid grid-cols-2 gap-4 text-sm">
-                  <div className="flex justify-between">
-                    <span className="text-gray-400">Active Users:</span>
-                    <span className="text-green-400">{accounts.filter(a => a.status === 'active').length}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-400">Processing:</span>
-                    <span className="text-purple-400">{accounts.filter(a => a.status === 'processing').length}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-400">Total Accounts:</span>
-                    <span className="text-blue-400">{accounts.length}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-400">Success Rate:</span>
-                    <span className="text-green-400">94.2%</span>
-                  </div>
+              <CardContent>
+                <div className="overflow-x-auto">
+                  <table className="w-full">
+                    <thead>
+                      <tr className="border-b border-purple-500/20">
+                        <th className="text-left py-3 px-4 text-sm font-medium text-purple-300">Product/Service</th>
+                        <th className="text-left py-3 px-4 text-sm font-medium text-purple-300">Eligibility</th>
+                        <th className="text-left py-3 px-4 text-sm font-medium text-purple-300">Product/Service</th>
+                        <th className="text-left py-3 px-4 text-sm font-medium text-purple-300">Price</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {eligibilityData.map((item, index) => (
+                        <tr key={index} className="border-b border-slate-700/50 hover:bg-slate-800/30">
+                          <td className="py-3 px-4 text-sm">{item.service}</td>
+                          <td className="py-3 px-4">
+                            {getEligibilityBadge(item.eligibility)}
+                          </td>
+                          <td className="py-3 px-4 text-sm text-gray-300">{item.productService}</td>
+                          <td className="py-3 px-4 text-sm font-medium text-purple-400">{item.price}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
                 </div>
               </CardContent>
             </Card>
           </div>
         </div>
-      </div>
 
-      {/* Floating Action Button */}
-      <div className="fixed bottom-8 right-8">
-        <Button 
-          size="lg"
-          className="cyberpunk-button rounded-full w-14 h-14 floating-action shadow-2xl"
-        >
-          <Plus className="w-6 h-6" />
-        </Button>
+        {/* Bottom Actions */}
+        <div className="fixed bottom-6 right-6 flex space-x-3">
+          <Button className="bg-slate-700 hover:bg-slate-600 text-white">
+            <ChevronDown className="w-4 h-4 mr-2" />
+            Float
+          </Button>
+          <Button variant="outline" className="border-purple-500/30 text-purple-300 hover:bg-purple-500/10">
+            View User Guides
+          </Button>
+          <Button variant="outline" className="border-purple-500/30 text-purple-300 hover:bg-purple-500/10">
+            Log Support Ticket
+          </Button>
+        </div>
       </div>
     </div>
   )
